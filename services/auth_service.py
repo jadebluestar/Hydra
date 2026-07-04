@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import secrets
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from redis.asyncio import Redis
@@ -91,9 +91,7 @@ class AuthService:
         access_token = self._jwt.encode({"sub": str(user.id), "type": "access"})
         access_payload = self._jwt.decode(access_token)
 
-        refresh_exp = datetime.now(timezone.utc) + timedelta(
-            seconds=self._refresh_ttl_seconds
-        )
+        refresh_exp = datetime.now(UTC) + timedelta(seconds=self._refresh_ttl_seconds)
         refresh_token = self._jwt.encode(
             {
                 "sub": str(user.id),
@@ -275,7 +273,7 @@ class AuthService:
             # TTL = seconds until the access token expires naturally.
             # After expiry, the token is invalid anyway — no need to keep the
             # revocation entry past that point.
-            remaining = max(0, int(access_exp - datetime.now(timezone.utc).timestamp()))
+            remaining = max(0, int(access_exp - datetime.now(UTC).timestamp()))
             if remaining > 0:
                 await self._redis.setex(
                     revoked_token_key(access_jti),

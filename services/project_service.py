@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 
-from core.exceptions import ConflictError, ForbiddenError, NotFoundError
+from core.exceptions import ConflictError, ForbiddenError
 from core.logging import get_logger
 from domain.enums.permission import Permission
 from domain.enums.role import Role
@@ -38,9 +38,7 @@ class ProjectService:
         project-level roles in v1. A user who is ADMIN in the org is ADMIN
         for all of that org's projects.
         """
-        membership = await self._memberships.get_by_org_and_user(
-            project.organization_id, user_id
-        )
+        membership = await self._memberships.get_by_org_and_user(project.organization_id, user_id)
         if not membership:
             raise ForbiddenError("Access denied")
         require_permission(Role(membership.role), permission)
@@ -59,9 +57,7 @@ class ProjectService:
         project = await self._projects.get_by_id(project_id)
         if not project:
             raise ForbiddenError("Project not found or access denied")
-        membership = await self._memberships.get_by_org_and_user(
-            project.organization_id, user_id
-        )
+        membership = await self._memberships.get_by_org_and_user(project.organization_id, user_id)
         if not membership:
             raise ForbiddenError("Project not found or access denied")
         return project
@@ -75,9 +71,7 @@ class ProjectService:
         description: str | None,
         requesting_user_id: uuid.UUID,
     ) -> Project:
-        membership = await self._memberships.get_by_org_and_user(
-            org_id, requesting_user_id
-        )
+        membership = await self._memberships.get_by_org_and_user(org_id, requesting_user_id)
         if not membership:
             raise ForbiddenError("You are not a member of this organization")
         require_permission(Role(membership.role), Permission.CREATE_PROJECT)
@@ -116,9 +110,7 @@ class ProjectService:
         limit: int = 50,
         offset: int = 0,
     ) -> list[Project]:
-        membership = await self._memberships.get_by_org_and_user(
-            org_id, requesting_user_id
-        )
+        membership = await self._memberships.get_by_org_and_user(org_id, requesting_user_id)
         if not membership:
             raise ForbiddenError("You are not a member of this organization")
         require_permission(Role(membership.role), Permission.VIEW_PROJECT)

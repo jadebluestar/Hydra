@@ -24,7 +24,6 @@ from providers.implementations.jwt_hs256 import HS256JWTProvider
 from providers.implementations.mock_email import MockEmailProvider
 from repositories.user_repository import UserRepository
 from schemas.auth import (
-    AccessTokenResponse,
     LoginRequest,
     LogoutRequest,
     RefreshRequest,

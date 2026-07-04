@@ -45,9 +45,7 @@ class AnalyticsService:
         project = await self._projects.get_by_id(project_id)
         if not project:
             raise ForbiddenError("Project not found or access denied")
-        membership = await self._memberships.get_by_org_and_user(
-            project.organization_id, user_id
-        )
+        membership = await self._memberships.get_by_org_and_user(project.organization_id, user_id)
         if not membership:
             raise ForbiddenError("Access denied")
         require_permission(Role(membership.role), permission)
@@ -59,9 +57,7 @@ class AnalyticsService:
         requesting_user_id: uuid.UUID,
         hours: int = 24,
     ) -> dict[str, Any]:
-        await self._require_permission(
-            project_id, requesting_user_id, Permission.VIEW_ANALYTICS
-        )
+        await self._require_permission(project_id, requesting_user_id, Permission.VIEW_ANALYTICS)
         return await self._logs.get_summary(project_id, hours=hours)
 
     async def list_requests(
@@ -72,9 +68,5 @@ class AnalyticsService:
         limit: int = 50,
         offset: int = 0,
     ) -> list[RequestLog]:
-        await self._require_permission(
-            project_id, requesting_user_id, Permission.VIEW_ANALYTICS
-        )
-        return await self._logs.list_by_project(
-            project_id, limit=limit, offset=offset
-        )
+        await self._require_permission(project_id, requesting_user_id, Permission.VIEW_ANALYTICS)
+        return await self._logs.list_by_project(project_id, limit=limit, offset=offset)

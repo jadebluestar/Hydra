@@ -68,9 +68,7 @@ class UpdateMemberRoleRequest(BaseModel):
             raise ValueError(f"Invalid role '{v}'. Must be one of: {valid}")
         # OWNER can only be set via transfer_ownership, not a role update.
         if role == Role.OWNER:
-            raise ValueError(
-                "Cannot assign owner role via role update. Use transfer ownership."
-            )
+            raise ValueError("Cannot assign owner role via role update. Use transfer ownership.")
         return v
 
 

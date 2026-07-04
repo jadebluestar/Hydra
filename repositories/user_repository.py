@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import uuid
-from datetime import datetime, timezone
-from typing import Any, Sequence
+from collections.abc import Sequence
+from datetime import UTC, datetime
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -43,7 +43,7 @@ class UserRepository(BaseRepository[User]):
         return await self.save(user)
 
     async def update_last_login(self, user: User) -> None:
-        user.last_login_at = datetime.now(timezone.utc)
+        user.last_login_at = datetime.now(UTC)
         await self._session.flush()
 
     async def soft_delete(self, user: User) -> None:

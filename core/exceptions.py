@@ -21,7 +21,6 @@ log line, so callers can trace an error back to their original request.
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from pydantic import ValidationError
 
 from core.logging import get_logger
 

@@ -48,8 +48,8 @@ def uuid7() -> uuid.UUID:
 
     # 10 random bytes = 80 bits; we need 12 + 62 = 74 usable bits
     rand = int.from_bytes(os.urandom(10), "big")
-    rand_a = (rand >> 62) & 0x0FFF       # top 12 bits
-    rand_b = rand & 0x3FFFFFFFFFFFFFFF    # bottom 62 bits
+    rand_a = (rand >> 62) & 0x0FFF  # top 12 bits
+    rand_b = rand & 0x3FFFFFFFFFFFFFFF  # bottom 62 bits
 
     # High 64 bits: [48-bit timestamp][4-bit version=7][12-bit rand_a]
     high = ((ms & 0xFFFFFFFFFFFF) << 16) | (0x7 << 12) | rand_a

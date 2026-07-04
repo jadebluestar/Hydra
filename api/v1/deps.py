@@ -74,6 +74,7 @@ async def get_current_user(
     jti = payload.get("jti")
     if jti:
         from cache.keys import revoked_token_key
+
         revoked = await redis.get(revoked_token_key(jti))
         if revoked is not None:
             raise UnauthorizedError("Token has been revoked")
@@ -83,6 +84,7 @@ async def get_current_user(
         raise UnauthorizedError("Token missing subject claim")
 
     import uuid
+
     user_repo = UserRepository(session)
     user = await user_repo.get_by_id(uuid.UUID(user_id_str))
 

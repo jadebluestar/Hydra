@@ -57,9 +57,6 @@ def validate_requested_scopes(requested: list[str]) -> list[str]:
     invalid = [s for s in requested if s not in valid_values]
 
     if invalid:
-        raise ValueError(
-            f"Unrecognized scope(s): {invalid}. "
-            f"Valid scopes: {sorted(valid_values)}"
-        )
+        raise ValueError(f"Unrecognized scope(s): {invalid}. Valid scopes: {sorted(valid_values)}")
 
     return requested

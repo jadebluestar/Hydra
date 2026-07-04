@@ -21,8 +21,7 @@ CORRELATION_ID_HEADER = "X-Correlation-ID"
 class CorrelationIDMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: object) -> Response:
         correlation_id = (
-            request.headers.get(CORRELATION_ID_HEADER)
-            or f"corr_{uuid.uuid4().hex[:16]}"
+            request.headers.get(CORRELATION_ID_HEADER) or f"corr_{uuid.uuid4().hex[:16]}"
         )
         request.state.correlation_id = correlation_id
 

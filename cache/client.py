@@ -11,10 +11,9 @@ to store raw binary data (e.g., serialized protobuf), create a separate client
 with decode_responses=False.
 """
 
+import structlog
 from redis.asyncio import Redis
 from redis.asyncio.connection import ConnectionPool
-
-import structlog
 
 from core.config import get_settings
 

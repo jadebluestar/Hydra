@@ -133,9 +133,7 @@ async def list_members(
 ) -> list[MemberResponse]:
     svc = _build_service(session)
     org = await svc.get_by_slug(slug=slug, requesting_user_id=current_user.id)
-    members = await svc.list_members(
-        org_id=org.id, requesting_user_id=current_user.id
-    )
+    members = await svc.list_members(org_id=org.id, requesting_user_id=current_user.id)
     return [
         MemberResponse(
             user_id=m.user_id,
@@ -171,8 +169,8 @@ async def invite_member(
     )
     # Reload with user data for the response
     from sqlalchemy.orm import selectinload
-    from repositories.membership_repository import MembershipRepository as MR
-    m = await MR(session).get_by_org_and_user(
+
+    m = await MembershipRepository(session).get_by_org_and_user(
         org.id,
         membership.user_id,
         options=[selectinload(type(membership).user)],
@@ -202,8 +200,10 @@ async def update_member_role(
     svc = _build_service(session)
     org = await svc.get_by_slug(slug=slug, requesting_user_id=current_user.id)
     from sqlalchemy.orm import selectinload
+
     from models.membership import OrganizationMembership
-    membership = await svc.update_member_role(
+
+    await svc.update_member_role(
         org_id=org.id,
         requesting_user_id=current_user.id,
         target_user_id=user_id,

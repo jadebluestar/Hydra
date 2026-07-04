@@ -85,12 +85,12 @@ async def check_rate_limit(
 
     result: int = await redis.eval(
         _SLIDING_WINDOW_LUA,
-        1,           # numkeys
-        key,         # KEYS[1]
+        1,  # numkeys
+        key,  # KEYS[1]
         str(limit),  # ARGV[1]
-        str(now_ms), # ARGV[2]
+        str(now_ms),  # ARGV[2]
         str(_WINDOW_MS),  # ARGV[3]
-        req_id,      # ARGV[4]
+        req_id,  # ARGV[4]
     )
 
     if result == -1:

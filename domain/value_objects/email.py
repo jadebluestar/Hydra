@@ -27,9 +27,7 @@ from dataclasses import dataclass
 # RFC 5321 / 5322 simplified pattern. The full RFC regex is impractical.
 # We rely on pydantic's email-validator at the HTTP layer for thorough checks;
 # this pattern catches obviously malformed values in the domain layer.
-_EMAIL_RE = re.compile(
-    r"^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
-)
+_EMAIL_RE = re.compile(r"^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$")
 
 
 @dataclass(frozen=True)

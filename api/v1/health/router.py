@@ -26,13 +26,13 @@ restart it — the problem is load, not a hung process).
 
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
+from redis.asyncio import Redis
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from cache.client import get_redis
 from core.config import get_settings
 from database.session import get_db
-from redis.asyncio import Redis
 from schemas.common import HealthResponse, LivenessResponse, ReadinessCheck
 
 router = APIRouter(tags=["observability"])

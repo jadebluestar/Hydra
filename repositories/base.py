@@ -14,7 +14,8 @@ Pattern overview:
 from __future__ import annotations
 
 import uuid
-from typing import Any, Generic, Sequence, Type, TypeVar
+from collections.abc import Sequence
+from typing import Any
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,11 +23,9 @@ from sqlalchemy.sql import Select
 
 from database.base import HydraSoftDeleteBase
 
-ModelT = TypeVar("ModelT")
 
-
-class BaseRepository(Generic[ModelT]):
-    def __init__(self, session: AsyncSession, model_class: Type[ModelT]) -> None:
+class BaseRepository[ModelT]:
+    def __init__(self, session: AsyncSession, model_class: type[ModelT]) -> None:
         self._session = session
         self._model = model_class
         self._is_soft_delete = issubclass(model_class, HydraSoftDeleteBase)
@@ -83,9 +82,7 @@ class BaseRepository(Generic[ModelT]):
 
     async def count(self) -> int:
         """Count of non-deleted records (excludes soft-deleted rows)."""
-        stmt = select(func.count()).select_from(
-            self._base_select().subquery()
-        )
+        stmt = select(func.count()).select_from(self._base_select().subquery())
         result = await self._session.execute(stmt)
         return result.scalar_one()
 

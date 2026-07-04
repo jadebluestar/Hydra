@@ -38,14 +38,10 @@ class RoutePath:
             raise ValueError("Route path cannot be empty")
 
         if not raw.startswith("/"):
-            raise ValueError(
-                f"Route path must start with '/': {raw!r}"
-            )
+            raise ValueError(f"Route path must start with '/': {raw!r}")
 
         if "//" in raw:
-            raise ValueError(
-                f"Route path must not contain '//': {raw!r}"
-            )
+            raise ValueError(f"Route path must not contain '//': {raw!r}")
 
         # Normalize: strip trailing slash, but preserve root "/"
         normalized = raw.rstrip("/") or "/"

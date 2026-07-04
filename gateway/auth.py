@@ -25,7 +25,7 @@ def extract_api_key(request: Request) -> str:
     auth = request.headers.get("authorization", "")
     if not auth.startswith("Bearer "):
         raise UnauthorizedError("Missing or invalid Authorization header")
-    token = auth[len("Bearer "):].strip()
+    token = auth[len("Bearer ") :].strip()
     if not token:
         raise UnauthorizedError("Missing API key")
     return token
@@ -42,6 +42,4 @@ def check_scope(granted_scopes: list[str], required_scope: str | None) -> None:
     if required_scope is None:
         return
     if not has_scope(granted_scopes, APIKeyScope(required_scope)):
-        raise ForbiddenError(
-            f"API key scope insufficient: requires '{required_scope}'"
-        )
+        raise ForbiddenError(f"API key scope insufficient: requires '{required_scope}'")

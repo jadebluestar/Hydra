@@ -40,7 +40,10 @@ dev = [
 [tool.hatch.build.targets.wheel]
 # This is a service, not a library. Hatchling packages no source —
 # pip install . installs dependencies only. The app runs from the project root.
-packages = []
+# bypass-selection skips hatchling's file auto-detection entirely; without it,
+# hatchling errors out ("unable to determine which files to ship") because
+# packages = [] alone isn't enough to produce an intentionally-empty wheel.
+bypass-selection = true
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

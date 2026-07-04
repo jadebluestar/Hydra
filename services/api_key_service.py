@@ -52,9 +52,7 @@ class APIKeyService:
         project = await self._projects.get_by_id(project_id)
         if not project:
             raise ForbiddenError("Project not found or access denied")
-        membership = await self._memberships.get_by_org_and_user(
-            project.organization_id, user_id
-        )
+        membership = await self._memberships.get_by_org_and_user(project.organization_id, user_id)
         if not membership:
             raise ForbiddenError("Access denied")
         require_permission(Role(membership.role), permission)
@@ -110,9 +108,7 @@ class APIKeyService:
         include_revoked: bool = False,
     ) -> list[APIKey]:
         await self._require_permission(project_id, requesting_user_id, Permission.VIEW_API_KEYS)
-        return await self._keys.list_by_project(
-            project_id, include_revoked=include_revoked
-        )
+        return await self._keys.list_by_project(project_id, include_revoked=include_revoked)
 
     async def revoke(
         self,

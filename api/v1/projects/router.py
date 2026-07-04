@@ -54,9 +54,11 @@ async def list_projects(
     offset: int = Query(default=0, ge=0),
 ) -> list[ProjectResponse]:
     from repositories.organization_repository import OrganizationRepository
+
     org = await OrganizationRepository(session).get_by_slug(slug)
     if not org:
         from core.exceptions import ForbiddenError
+
         raise ForbiddenError("Organization not found or access denied")
     svc = _project_service(session)
     projects = await svc.list_by_org(
@@ -82,9 +84,11 @@ async def create_project(
     session: AsyncSession = Depends(get_db),
 ) -> ProjectResponse:
     from repositories.organization_repository import OrganizationRepository
+
     org = await OrganizationRepository(session).get_by_slug(slug)
     if not org:
         from core.exceptions import ForbiddenError
+
         raise ForbiddenError("Organization not found or access denied")
     svc = _project_service(session)
     project = await svc.create(

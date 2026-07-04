@@ -184,7 +184,7 @@ async def gateway_proxy(
         # 8. Build target URL — strip prefix if configured
         target_path = full_path
         if match.strip_prefix and match.path_prefix != "/":
-            target_path = full_path[len(match.path_prefix):] or "/"
+            target_path = full_path[len(match.path_prefix) :] or "/"
 
         url = match.upstream_base_url + target_path
 

@@ -12,15 +12,12 @@ from __future__ import annotations
 
 import uuid
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
 from core.exceptions import ConflictError, ForbiddenError, NotFoundError
-from domain.enums.permission import Permission
-from domain.enums.role import Role
 from services.organization_service import OrganizationService
-
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -61,9 +58,7 @@ def _make_service(
     members: list[MagicMock] | None = None,
 ) -> tuple[OrganizationService, dict[str, Any]]:
     mock_org = org or _make_org()
-    mock_membership = membership or _make_membership(
-        org_id=mock_org.id, role="owner"
-    )
+    mock_membership = membership or _make_membership(org_id=mock_org.id, role="owner")
 
     org_repo = AsyncMock()
     org_repo.slug_exists.return_value = slug_exists
@@ -227,7 +222,7 @@ class TestInviteMember:
         mocks["membership_repo"].get_by_org_and_user.side_effect = [
             owner_membership,  # first call: requester's membership
             owner_membership,  # second call (for role rank check): same
-            None,              # third call: invited user has no membership
+            None,  # third call: invited user has no membership
         ]
         await svc.invite_member(
             org_id=uuid.uuid4(),
@@ -253,8 +248,8 @@ class TestInviteMember:
         svc, mocks = _make_service(membership=owner_membership)
         existing_membership = _make_membership(role="member")
         mocks["membership_repo"].get_by_org_and_user.side_effect = [
-            owner_membership,   # requester's membership
-            owner_membership,   # role rank check
+            owner_membership,  # requester's membership
+            owner_membership,  # role rank check
             existing_membership,  # invited user already has membership
         ]
         with pytest.raises(ConflictError, match="already a member"):
@@ -334,31 +329,37 @@ class TestRemoveMember:
 class TestSlugify:
     def test_basic_name(self) -> None:
         from utils.slugify import slugify
+
         assert slugify("Acme Corp") == "acme-corp"
 
     def test_special_chars_removed(self) -> None:
         from utils.slugify import slugify
+
         assert slugify("Hello, World!") == "hello-world"
 
     def test_leading_trailing_hyphens_stripped(self) -> None:
         from utils.slugify import slugify
+
         result = slugify("  Spaced  ")
         assert not result.startswith("-")
         assert not result.endswith("-")
 
     def test_max_length_63(self) -> None:
         from utils.slugify import slugify
+
         long_name = "a" * 100
         assert len(slugify(long_name)) <= 63
 
     def test_valid_slug_accepted(self) -> None:
         from utils.slugify import is_valid_slug
+
         assert is_valid_slug("acme-corp") is True
         assert is_valid_slug("my-org-123") is True
 
     def test_invalid_slug_rejected(self) -> None:
         from utils.slugify import is_valid_slug
-        assert is_valid_slug("AB") is False           # too short
+
+        assert is_valid_slug("AB") is False  # too short
         assert is_valid_slug("-starts-with-hyphen") is False
         assert is_valid_slug("has spaces") is False
         assert is_valid_slug("HAS_UPPERCASE") is False

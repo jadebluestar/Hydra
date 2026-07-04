@@ -24,7 +24,7 @@ The caller controls the payload; we only ADD claims, never overwrite sub.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from jose import JWTError, jwt
@@ -59,7 +59,7 @@ class HS256JWTProvider:
         the provider owns the token lifecycle. The caller doesn't
         need to know how revocation works — just that it does.
         """
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         claims = {
             "iat": now,
             "exp": now + self._access_ttl,

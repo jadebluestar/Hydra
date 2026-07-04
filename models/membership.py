@@ -51,9 +51,7 @@ class OrganizationMembership(HydraBase):
     # require a DB migration — just update the Python enum.
     role: Mapped[str] = mapped_column(String(50), nullable=False, default="member")
 
-    joined_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    joined_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # Two FKs point to the users table: user_id and invited_by_id.
     # SQLAlchemy requires `foreign_keys=` to resolve the ambiguity — otherwise

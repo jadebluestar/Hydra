@@ -45,7 +45,7 @@ class RouteMatch:
 
 @dataclass
 class _TrieNode:
-    children: dict[str, "_TrieNode"] = field(default_factory=dict)
+    children: dict[str, _TrieNode] = field(default_factory=dict)
     route: RouteMatch | None = None
 
 

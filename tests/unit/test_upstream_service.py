@@ -139,6 +139,7 @@ class TestUpstreamServiceCreate:
         svc, mocks = _make_svc()
         mocks["upstream_repo"].get_by_id  # not called here; project check fails
         from unittest.mock import AsyncMock
+
         svc._projects.get_by_id = AsyncMock(return_value=None)
         with pytest.raises(ForbiddenError):
             await svc.create(

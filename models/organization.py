@@ -38,9 +38,7 @@ class Organization(HydraSoftDeleteBase):
         lazy="raise",
     )
 
-    __table_args__ = (
-        Index("ix_organizations_slug", "slug"),
-    )
+    __table_args__ = (Index("ix_organizations_slug", "slug"),)
 
     def __repr__(self) -> str:
         return f"<Organization id={self.id} slug={self.slug!r}>"

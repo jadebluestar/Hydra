@@ -49,9 +49,7 @@ class UpstreamService:
         project = await self._projects.get_by_id(project_id)
         if not project:
             raise ForbiddenError("Project not found or access denied")
-        membership = await self._memberships.get_by_org_and_user(
-            project.organization_id, user_id
-        )
+        membership = await self._memberships.get_by_org_and_user(project.organization_id, user_id)
         if not membership:
             raise ForbiddenError("Access denied")
         require_permission(Role(membership.role), permission)
@@ -76,9 +74,7 @@ class UpstreamService:
         timeout_seconds: int = 30,
         retries: int = 3,
     ) -> Upstream:
-        await self._require_permission(
-            project_id, requesting_user_id, Permission.CREATE_UPSTREAM
-        )
+        await self._require_permission(project_id, requesting_user_id, Permission.CREATE_UPSTREAM)
         upstream = await self._upstreams.create(
             project_id=project_id,
             name=name,
@@ -101,12 +97,8 @@ class UpstreamService:
         limit: int = 50,
         offset: int = 0,
     ) -> list[Upstream]:
-        await self._require_permission(
-            project_id, requesting_user_id, Permission.VIEW_ROUTES
-        )
-        return await self._upstreams.list_by_project(
-            project_id, limit=limit, offset=offset
-        )
+        await self._require_permission(project_id, requesting_user_id, Permission.VIEW_ROUTES)
+        return await self._upstreams.list_by_project(project_id, limit=limit, offset=offset)
 
     async def get(
         self,
@@ -115,9 +107,7 @@ class UpstreamService:
         project_id: uuid.UUID,
         requesting_user_id: uuid.UUID,
     ) -> Upstream:
-        await self._require_permission(
-            project_id, requesting_user_id, Permission.VIEW_ROUTES
-        )
+        await self._require_permission(project_id, requesting_user_id, Permission.VIEW_ROUTES)
         return await self._get_upstream_for_project(upstream_id, project_id)
 
     async def update(
@@ -131,9 +121,7 @@ class UpstreamService:
         timeout_seconds: int | None = None,
         retries: int | None = None,
     ) -> Upstream:
-        await self._require_permission(
-            project_id, requesting_user_id, Permission.UPDATE_UPSTREAM
-        )
+        await self._require_permission(project_id, requesting_user_id, Permission.UPDATE_UPSTREAM)
         upstream = await self._get_upstream_for_project(upstream_id, project_id)
         if name is not None:
             upstream.name = name
@@ -152,9 +140,7 @@ class UpstreamService:
         project_id: uuid.UUID,
         requesting_user_id: uuid.UUID,
     ) -> None:
-        await self._require_permission(
-            project_id, requesting_user_id, Permission.DELETE_UPSTREAM
-        )
+        await self._require_permission(project_id, requesting_user_id, Permission.DELETE_UPSTREAM)
         upstream = await self._get_upstream_for_project(upstream_id, project_id)
         await self._upstreams.soft_delete(upstream)
         logger.info("upstream.deleted", upstream_id=str(upstream_id))

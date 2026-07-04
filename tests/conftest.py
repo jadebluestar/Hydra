@@ -25,6 +25,8 @@ os.environ.setdefault("APP_ENV", "development")
 os.environ.setdefault("DEBUG", "false")
 
 # ── App imports (after env is set) ────────────────────────────────────────────
+from collections.abc import AsyncIterator
+
 import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
@@ -40,19 +42,21 @@ def clear_settings_cache() -> None:
 
 
 @pytest_asyncio.fixture
-async def client() -> AsyncClient:
+async def client() -> AsyncIterator[AsyncClient]:
     """
     HTTP test client that drives the full ASGI app — middleware, lifespan,
     dependency injection, exception handlers — without starting a real server.
 
-    ASGITransport triggers the lifespan context manager, so init_db_pool() and
-    init_redis_pool() run. Because pool creation is lazy (no actual connections
-    until a query fires), tests that don't hit the DB or Redis work without
-    any infrastructure.
+    ASGITransport only forwards HTTP scopes; it never sends "lifespan" events
+    on its own, so init_db_pool()/init_redis_pool() would otherwise never run.
+    We enter the app's lifespan context manager explicitly instead. Because
+    pool creation is lazy (no actual connections until a query fires), tests
+    that don't hit the DB or Redis still work without any infrastructure.
     """
     app = create_app()
-    async with AsyncClient(
-        transport=ASGITransport(app=app),
-        base_url="http://testserver",
-    ) as ac:
-        yield ac
+    async with app.router.lifespan_context(app):
+        async with AsyncClient(
+            transport=ASGITransport(app=app),
+            base_url="http://testserver",
+        ) as ac:
+            yield ac

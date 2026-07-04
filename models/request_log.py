@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import uuid
-from typing import Optional
 
 from sqlalchemy import Boolean, Index, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
@@ -26,15 +25,9 @@ class RequestLog(HydraBase):
     __tablename__ = "request_logs"
 
     # Identity — nullable because auth may fail before these are resolved
-    project_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        UUID(as_uuid=True), nullable=True
-    )
-    api_key_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        UUID(as_uuid=True), nullable=True
-    )
-    route_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        UUID(as_uuid=True), nullable=True
-    )
+    project_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
+    api_key_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
+    route_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
 
     # Request
     http_method: Mapped[str] = mapped_column(String(10), nullable=False)
@@ -45,7 +38,7 @@ class RequestLog(HydraBase):
     # Response
     status_code: Mapped[int] = mapped_column(Integer, nullable=False)
     # upstream_latency_ms is None when no upstream was reached (auth fail, no route, etc.)
-    upstream_latency_ms: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    upstream_latency_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
     total_latency_ms: Mapped[int] = mapped_column(Integer, nullable=False)
     is_rate_limited: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 

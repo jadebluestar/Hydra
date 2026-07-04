@@ -6,13 +6,10 @@ tests/integration/ and require the `infra` marker. These tests only
 verify the structural and import-level correctness of the repository layer.
 """
 
-import uuid
-
-import pytest
+from datetime import UTC
 
 from database.base import HydraBase, HydraSoftDeleteBase
 from repositories.base import BaseRepository
-
 
 # ── Soft-delete detection ─────────────────────────────────────────────────────
 #
@@ -60,6 +57,7 @@ class TestRepositoryImports:
             UpstreamRepository,
             UserRepository,
         )
+
         repos = [
             APIKeyRepository,
             BaseRepository,
@@ -74,7 +72,6 @@ class TestRepositoryImports:
             assert repo is not None
 
     def test_base_repository_is_generic(self) -> None:
-        from repositories.base import BaseRepository
         # BaseRepository is Generic[ModelT] — it should have __class_getitem__
         assert hasattr(BaseRepository, "__class_getitem__")
 
@@ -86,20 +83,21 @@ class TestRepositoryModelPairing:
     """Each repository must be wired to the correct model class."""
 
     def test_user_repository_uses_user_model(self) -> None:
-        from models.user import User
-        from repositories.user_repository import UserRepository
-
         # We can inspect the class without a session by checking the
         # model_class argument via __init_subclass__ introspection.
         # Instead, verify UserRepository is defined in terms of User.
         import inspect
+
+        from repositories.user_repository import UserRepository
+
         src = inspect.getsource(UserRepository.__init__)
         assert "User" in src
 
     def test_route_repository_uses_route_model(self) -> None:
-        from models.route import Route
-        from repositories.route_repository import RouteRepository
         import inspect
+
+        from repositories.route_repository import RouteRepository
+
         src = inspect.getsource(RouteRepository.__init__)
         assert "Route" in src
 
@@ -115,39 +113,48 @@ class TestAPIKeyModel:
 
     def test_is_revoked_false_by_default(self) -> None:
         from models.api_key import APIKey
+
         key = APIKey()
         assert key.is_revoked is False
 
     def test_is_revoked_true_when_revoked_at_set(self) -> None:
-        from datetime import datetime, timezone
+        from datetime import datetime
+
         from models.api_key import APIKey
+
         key = APIKey()
-        key.revoked_at = datetime.now(timezone.utc)
+        key.revoked_at = datetime.now(UTC)
         assert key.is_revoked is True
 
     def test_is_expired_false_when_no_expiry(self) -> None:
         from models.api_key import APIKey
+
         key = APIKey()
         key.expires_at = None
         assert key.is_expired is False
 
     def test_is_expired_true_when_past_expiry(self) -> None:
-        from datetime import datetime, timezone, timedelta
+        from datetime import datetime, timedelta
+
         from models.api_key import APIKey
+
         key = APIKey()
-        key.expires_at = datetime.now(timezone.utc) - timedelta(hours=1)
+        key.expires_at = datetime.now(UTC) - timedelta(hours=1)
         assert key.is_expired is True
 
     def test_is_active_false_when_revoked(self) -> None:
-        from datetime import datetime, timezone
+        from datetime import datetime
+
         from models.api_key import APIKey
+
         key = APIKey()
-        key.revoked_at = datetime.now(timezone.utc)
+        key.revoked_at = datetime.now(UTC)
         key.expires_at = None
         assert key.is_active is False
 
     def test_is_active_true_when_not_revoked_and_not_expired(self) -> None:
         from models.api_key import APIKey
+
         key = APIKey()
         key.revoked_at = None
         key.expires_at = None
@@ -160,6 +167,7 @@ class TestAPIKeyModel:
 class TestRouteModel:
     def test_route_repr_includes_path_prefix(self) -> None:
         from models.route import Route
+
         route = Route()
         route.path_prefix = "/api/v1"
         route.is_active = True

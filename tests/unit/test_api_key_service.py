@@ -10,7 +10,6 @@ import pytest
 from core.exceptions import ForbiddenError, NotFoundError
 from utils.api_key import extract_prefix, generate_api_key, verify_key
 
-
 # ── Key generation utilities ──────────────────────────────────────────────────
 
 

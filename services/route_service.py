@@ -63,9 +63,7 @@ class RouteService:
         project = await self._projects.get_by_id(project_id)
         if not project:
             raise ForbiddenError("Project not found or access denied")
-        membership = await self._memberships.get_by_org_and_user(
-            project.organization_id, user_id
-        )
+        membership = await self._memberships.get_by_org_and_user(project.organization_id, user_id)
         if not membership:
             raise ForbiddenError("Access denied")
         require_permission(Role(membership.role), permission)
@@ -103,9 +101,7 @@ class RouteService:
         rate_limit_rpm: int | None = None,
         is_active: bool = True,
     ) -> Route:
-        await self._require_permission(
-            project_id, requesting_user_id, Permission.CREATE_ROUTE
-        )
+        await self._require_permission(project_id, requesting_user_id, Permission.CREATE_ROUTE)
         normalized_path = RoutePath(path_prefix).value
         await self._validate_upstream_in_project(upstream_id, project_id)
 
@@ -137,9 +133,7 @@ class RouteService:
         limit: int = 100,
         offset: int = 0,
     ) -> list[Route]:
-        await self._require_permission(
-            project_id, requesting_user_id, Permission.VIEW_ROUTES
-        )
+        await self._require_permission(project_id, requesting_user_id, Permission.VIEW_ROUTES)
         return await self._routes.list_by_project(
             project_id,
             active_only=active_only,
@@ -154,9 +148,7 @@ class RouteService:
         project_id: uuid.UUID,
         requesting_user_id: uuid.UUID,
     ) -> Route:
-        await self._require_permission(
-            project_id, requesting_user_id, Permission.VIEW_ROUTES
-        )
+        await self._require_permission(project_id, requesting_user_id, Permission.VIEW_ROUTES)
         return await self._get_route_for_project(route_id, project_id)
 
     async def update(
@@ -174,9 +166,7 @@ class RouteService:
         rate_limit_rpm: Any = _UNSET,
         is_active: bool | None = None,
     ) -> Route:
-        await self._require_permission(
-            project_id, requesting_user_id, Permission.UPDATE_ROUTE
-        )
+        await self._require_permission(project_id, requesting_user_id, Permission.UPDATE_ROUTE)
         route = await self._get_route_for_project(route_id, project_id)
 
         if name is not None:
@@ -206,9 +196,7 @@ class RouteService:
         project_id: uuid.UUID,
         requesting_user_id: uuid.UUID,
     ) -> None:
-        await self._require_permission(
-            project_id, requesting_user_id, Permission.DELETE_ROUTE
-        )
+        await self._require_permission(project_id, requesting_user_id, Permission.DELETE_ROUTE)
         route = await self._get_route_for_project(route_id, project_id)
         await self._routes.soft_delete(route)
         logger.info("route.deleted", route_id=str(route_id))

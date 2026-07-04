@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import uuid
 
-import pytest
-
 from gateway.trie import PathTrie, RouteMatch
 
 
@@ -69,7 +67,7 @@ class TestPathTrieLongestPrefix:
         trie = PathTrie()
         long_ = _route("/api/v1/users")
         short = _route("/api/v1")
-        trie.insert(long_)   # insert longer first
+        trie.insert(long_)  # insert longer first
         trie.insert(short)
         assert trie.match("/api/v1/users/123") is long_
 

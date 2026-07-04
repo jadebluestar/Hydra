@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from sqlalchemy import Integer, cast, func, select
@@ -74,7 +74,7 @@ class RequestLogRepository(BaseRepository[RequestLog]):
         Uses PostgreSQL's COUNT(1) FILTER (WHERE ...) to compute success/error
         counts in a single query rather than two separate SELECTs.
         """
-        since = datetime.now(timezone.utc) - timedelta(hours=hours)
+        since = datetime.now(UTC) - timedelta(hours=hours)
 
         stmt = select(
             func.count(1).label("total"),

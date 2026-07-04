@@ -47,9 +47,7 @@ async def forward_request(
     timeout: int,
     client_ip: str,
 ) -> Response:
-    forward_headers = {
-        k: v for k, v in headers.items() if k.lower() not in _HOP_BY_HOP
-    }
+    forward_headers = {k: v for k, v in headers.items() if k.lower() not in _HOP_BY_HOP}
     forward_headers["x-forwarded-for"] = client_ip
     forward_headers["x-forwarded-host"] = headers.get("host", "")
     forward_headers["x-forwarded-proto"] = "https"
@@ -71,9 +69,7 @@ async def forward_request(
         raise HTTPException(status_code=502, detail=f"Upstream request failed: {exc}")
 
     response_headers = {
-        k: v
-        for k, v in upstream_resp.headers.items()
-        if k.lower() not in _HOP_BY_HOP
+        k: v for k, v in upstream_resp.headers.items() if k.lower() not in _HOP_BY_HOP
     }
 
     return Response(

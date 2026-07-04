@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import DateTime, ForeignKey, Index, String, text
@@ -67,15 +67,9 @@ class APIKey(HydraBase):
     )
 
     # Optional expiry. None = never expires.
-    expires_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
-    last_used_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
-    revoked_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     project: Mapped[Project] = relationship(
         "Project",
@@ -103,9 +97,9 @@ class APIKey(HydraBase):
     def is_expired(self) -> bool:
         if self.expires_at is None:
             return False
-        from datetime import timezone
         from datetime import datetime as dt
-        return dt.now(timezone.utc) > self.expires_at
+
+        return dt.now(UTC) > self.expires_at
 
     @property
     def is_active(self) -> bool:

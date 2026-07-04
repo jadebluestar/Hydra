@@ -8,6 +8,8 @@ An API gateway and developer platform: authenticate traffic with API keys, route
 - **Data plane** (`/gateway`) — API-key-authenticated proxy. Matches inbound paths against a per-project trie, checks scope/method/rate-limit/circuit-breaker, forwards to the upstream, logs the result.
 - **Playground** (`/playground`) — a small built-in Postman-like UI for firing ad-hoc requests through the control plane's `/api/v1/playground/execute` proxy endpoint (avoids CORS, no external tool needed).
 
+New to the codebase? Read **[ONBOARDING.md](ONBOARDING.md)** — full architecture walkthrough, request lifecycles, auth model, and the gotchas that aren't obvious from the code alone.
+
 ## Quick start
 
 ```bash

@@ -99,7 +99,4 @@ class Route(HydraSoftDeleteBase):
     )
 
     def __repr__(self) -> str:
-        return (
-            f"<Route id={self.id} path={self.path_prefix!r} "
-            f"active={self.is_active}>"
-        )
+        return f"<Route id={self.id} path={self.path_prefix!r} active={self.is_active}>"

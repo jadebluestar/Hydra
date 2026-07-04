@@ -8,7 +8,6 @@ import pytest
 from domain.enums import APIKeyScope, CircuitState, Permission, Role
 from domain.value_objects import Email, RoutePath
 
-
 # ── Email ─────────────────────────────────────────────────────────────────────
 
 

@@ -20,10 +20,7 @@ REQUEST_ID_HEADER = "X-Request-ID"
 
 class RequestIDMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: object) -> Response:
-        request_id = (
-            request.headers.get(REQUEST_ID_HEADER)
-            or f"req_{uuid.uuid4().hex[:16]}"
-        )
+        request_id = request.headers.get(REQUEST_ID_HEADER) or f"req_{uuid.uuid4().hex[:16]}"
         request.state.request_id = request_id
 
         response: Response = await call_next(request)  # type: ignore[operator]

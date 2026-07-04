@@ -7,21 +7,16 @@ mixin behavior in isolation.
 """
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-import pytest
-from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column
 
 from database.base import (
     Base,
     HydraBase,
     HydraSoftDeleteBase,
-    SoftDeleteMixin,
-    TimestampMixin,
-    UUIDMixin,
 )
-
 
 # ── Concrete test models ───────────────────────────────────────────────────────
 # We define throwaway models with underscore-prefixed table names to avoid
@@ -52,7 +47,7 @@ class TestSoftDeleteMixin:
 
     def test_is_deleted_true_when_deleted_at_set(self) -> None:
         model = EphemeralModel(name="gone")
-        model.deleted_at = datetime.now(timezone.utc)
+        model.deleted_at = datetime.now(UTC)
         assert model.is_deleted is True
 
     def test_soft_delete_sets_deleted_at(self) -> None:
@@ -66,10 +61,10 @@ class TestSoftDeleteMixin:
         assert model.deleted_at.tzinfo is not None  # timezone-aware
 
     def test_soft_delete_timestamp_is_recent(self) -> None:
-        before = datetime.now(timezone.utc)
+        before = datetime.now(UTC)
         model = EphemeralModel(name="timing-test")
         model.soft_delete()
-        after = datetime.now(timezone.utc)
+        after = datetime.now(UTC)
 
         assert model.deleted_at is not None
         assert before <= model.deleted_at <= after
@@ -187,7 +182,7 @@ class TestNamingConventions:
         assert "pk" in NAMING_CONVENTION
 
     def test_base_metadata_uses_naming_convention(self) -> None:
-        from database.base import Base, NAMING_CONVENTION
+        from database.base import NAMING_CONVENTION
 
         assert Base.metadata.naming_convention == NAMING_CONVENTION
 
@@ -208,7 +203,7 @@ class TestAlembicConfig:
 
     def test_alembic_env_imports_cleanly(self) -> None:
         # Importing database.base should not raise even without a real DB
-        from database.base import Base, HydraBase, HydraSoftDeleteBase
+        from database.base import HydraBase, HydraSoftDeleteBase
 
         assert HydraBase.__abstract__ is True
         assert HydraSoftDeleteBase.__abstract__ is True

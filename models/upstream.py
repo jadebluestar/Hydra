@@ -59,9 +59,7 @@ class Upstream(HydraSoftDeleteBase):
         lazy="raise",
     )
 
-    __table_args__ = (
-        Index("ix_upstreams_project_id", "project_id"),
-    )
+    __table_args__ = (Index("ix_upstreams_project_id", "project_id"),)
 
     def __repr__(self) -> str:
         return f"<Upstream id={self.id} name={self.name!r} url={self.base_url!r}>"

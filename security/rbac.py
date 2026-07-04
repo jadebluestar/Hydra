@@ -133,6 +133,4 @@ def require_permission(role: Role, permission: Permission) -> None:
     if not has_permission(role, permission):
         from core.exceptions import ForbiddenError
 
-        raise ForbiddenError(
-            f"Role '{role}' does not have permission: {permission}"
-        )
+        raise ForbiddenError(f"Role '{role}' does not have permission: {permission}")

@@ -11,7 +11,6 @@ from domain.enums.scope import APIKeyScope
 from security.rbac import ROLE_PERMISSIONS, get_permissions, has_permission, require_permission
 from security.scopes import has_scope, validate_requested_scopes
 
-
 # ── Role → Permission mapping ─────────────────────────────────────────────────
 
 

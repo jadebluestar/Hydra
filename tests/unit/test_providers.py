@@ -10,7 +10,6 @@ runs in ~2ms — close to instantaneous for test purposes, still
 exercising all the same code paths.
 """
 
-import os
 import time
 
 import pytest
@@ -20,7 +19,6 @@ from providers.implementations.argon2_hasher import Argon2Hasher
 from providers.implementations.env_secrets import EnvironmentSecretProvider
 from providers.implementations.jwt_hs256 import HS256JWTProvider
 from providers.implementations.mock_email import MockEmailProvider
-
 
 # ── JWT Provider ──────────────────────────────────────────────────────────────
 
@@ -201,7 +199,9 @@ class TestEnvironmentSecretProvider:
         monkeypatch.delenv("OPT_SECRET", raising=False)
         assert self._provider.get_optional("OPT_SECRET") is None
 
-    def test_get_optional_returns_default_when_missing(self, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_get_optional_returns_default_when_missing(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         monkeypatch.delenv("OPT_SECRET", raising=False)
         assert self._provider.get_optional("OPT_SECRET", default="fallback") == "fallback"
 

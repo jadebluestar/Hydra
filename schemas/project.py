@@ -17,9 +17,7 @@ class CreateProjectRequest(BaseModel):
     @classmethod
     def slug_must_be_valid(cls, v: str | None) -> str | None:
         if v is not None and not is_valid_slug(v):
-            raise ValueError(
-                "Slug must be 3-63 characters, lowercase alphanumeric and hyphens"
-            )
+            raise ValueError("Slug must be 3-63 characters, lowercase alphanumeric and hyphens")
         return v
 
 

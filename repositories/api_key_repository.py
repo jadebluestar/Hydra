@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
-from typing import Any, Sequence
+from datetime import UTC, datetime
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -62,14 +61,12 @@ class APIKeyRepository(BaseRepository[APIKey]):
         The gateway calls this on every authenticated request, so this query
         runs on the hot path. The index on key_prefix makes it fast.
         """
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         stmt = (
             select(APIKey)
             .where(APIKey.key_prefix == key_prefix)
             .where(APIKey.revoked_at.is_(None))
-            .where(
-                (APIKey.expires_at.is_(None)) | (APIKey.expires_at > now)
-            )
+            .where((APIKey.expires_at.is_(None)) | (APIKey.expires_at > now))
         )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
@@ -97,7 +94,7 @@ class APIKeyRepository(BaseRepository[APIKey]):
         return await self.save(api_key)
 
     async def revoke(self, api_key: APIKey) -> None:
-        api_key.revoked_at = datetime.now(timezone.utc)
+        api_key.revoked_at = datetime.now(UTC)
         await self._session.flush()
 
     async def update_last_used(self, api_key: APIKey) -> None:
@@ -108,5 +105,5 @@ class APIKeyRepository(BaseRepository[APIKey]):
         hot path — consider debouncing in future (update at most once per minute
         per key) if it becomes a bottleneck. For now correctness > performance.
         """
-        api_key.last_used_at = datetime.now(timezone.utc)
+        api_key.last_used_at = datetime.now(UTC)
         await self._session.flush()

@@ -14,7 +14,7 @@ Dependency pattern:
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy.orm import selectinload
 
@@ -111,8 +111,7 @@ class OrganizationService:
 
         if await self._orgs.slug_exists(resolved_slug):
             raise ConflictError(
-                f"The slug '{resolved_slug}' is already taken. "
-                "Please choose a different slug."
+                f"The slug '{resolved_slug}' is already taken. Please choose a different slug."
             )
 
         org = await self._orgs.create(name=name, slug=resolved_slug)
@@ -166,9 +165,7 @@ class OrganizationService:
         requesting_user_id: uuid.UUID,
         name: str | None = None,
     ) -> Organization:
-        await self._require_permission(
-            org_id, requesting_user_id, Permission.UPDATE_ORGANIZATION
-        )
+        await self._require_permission(org_id, requesting_user_id, Permission.UPDATE_ORGANIZATION)
         org = await self._get_org_or_404(org_id)
 
         if name is not None:
@@ -191,9 +188,7 @@ class OrganizationService:
         The soft delete sets deleted_at; the data remains in the DB for
         the retention period and can be restored if needed.
         """
-        await self._require_permission(
-            org_id, requesting_user_id, Permission.DELETE_ORGANIZATION
-        )
+        await self._require_permission(org_id, requesting_user_id, Permission.DELETE_ORGANIZATION)
         org = await self._get_org_or_404(org_id)
         await self._orgs.soft_delete(org)
         logger.info("org.deleted", org_id=str(org_id))
@@ -210,9 +205,7 @@ class OrganizationService:
         selectinload(OrganizationMembership.user) is passed as an option so the
         user's email and full_name are available without a second query per member.
         """
-        await self._require_permission(
-            org_id, requesting_user_id, Permission.VIEW_MEMBERS
-        )
+        await self._require_permission(org_id, requesting_user_id, Permission.VIEW_MEMBERS)
         return await self._memberships.list_by_org(
             org_id,
             options=[selectinload(OrganizationMembership.user)],
@@ -237,9 +230,7 @@ class OrganizationService:
             NotFoundError:   Invited email has no Hydra account.
             ConflictError:   User is already a member.
         """
-        await self._require_permission(
-            org_id, requesting_user_id, Permission.INVITE_MEMBER
-        )
+        await self._require_permission(org_id, requesting_user_id, Permission.INVITE_MEMBER)
 
         # The requester can't assign a role higher than their own.
         # (An ADMIN can't invite another ADMIN — only OWNER can.)
@@ -248,8 +239,8 @@ class OrganizationService:
         )
         requester_role = Role(requester_membership.role)  # type: ignore[union-attr]
         target_role = Role(role)
-        _ROLE_RANK = {Role.VIEWER: 0, Role.MEMBER: 1, Role.ADMIN: 2, Role.OWNER: 3}
-        if _ROLE_RANK[target_role] >= _ROLE_RANK[requester_role]:
+        role_rank = {Role.VIEWER: 0, Role.MEMBER: 1, Role.ADMIN: 2, Role.OWNER: 3}
+        if role_rank[target_role] >= role_rank[requester_role]:
             raise ForbiddenError(
                 f"You cannot assign the '{role}' role — "
                 "you can only invite members with a role lower than your own"
@@ -259,9 +250,7 @@ class OrganizationService:
         if not invited_user:
             raise NotFoundError(f"No account found for '{email}'")
 
-        existing = await self._memberships.get_by_org_and_user(
-            org_id, invited_user.id
-        )
+        existing = await self._memberships.get_by_org_and_user(org_id, invited_user.id)
         if existing:
             raise ConflictError("This user is already a member of the organization")
 
@@ -272,7 +261,7 @@ class OrganizationService:
             invited_by_id=requesting_user_id,
         )
         # Mark joined_at immediately (no invite-acceptance flow yet)
-        membership.joined_at = datetime.now(timezone.utc)
+        membership.joined_at = datetime.now(UTC)
         await self._memberships.save(membership)
 
         logger.info(
@@ -300,9 +289,7 @@ class OrganizationService:
         is_self = requesting_user_id == target_user_id
 
         if not is_self:
-            await self._require_permission(
-                org_id, requesting_user_id, Permission.REMOVE_MEMBER
-            )
+            await self._require_permission(org_id, requesting_user_id, Permission.REMOVE_MEMBER)
 
         target = await self._memberships.get_by_org_and_user(org_id, target_user_id)
         if not target:
@@ -311,9 +298,7 @@ class OrganizationService:
         if target.role == Role.OWNER.value:
             owner_count = await self._owner_count(org_id)
             if owner_count <= 1:
-                raise ForbiddenError(
-                    "Cannot remove the last owner. Transfer ownership first."
-                )
+                raise ForbiddenError("Cannot remove the last owner. Transfer ownership first.")
 
         await self._memberships.delete(target)
         logger.info(
@@ -337,9 +322,7 @@ class OrganizationService:
         Cannot change a member's role to OWNER (use transfer_ownership).
         Cannot demote the last OWNER.
         """
-        await self._require_permission(
-            org_id, requesting_user_id, Permission.UPDATE_MEMBER_ROLE
-        )
+        await self._require_permission(org_id, requesting_user_id, Permission.UPDATE_MEMBER_ROLE)
 
         target = await self._memberships.get_by_org_and_user(org_id, target_user_id)
         if not target:

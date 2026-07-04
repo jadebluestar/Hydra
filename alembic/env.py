@@ -30,10 +30,11 @@ import sys
 from logging.config import fileConfig
 from pathlib import Path
 
-from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
+
+from alembic import context
 
 # Safety net: ensure the project root is in sys.path even if alembic.ini's
 # prepend_sys_path didn't work (e.g., when running from a different cwd).
@@ -41,15 +42,15 @@ _project_root = str(Path(__file__).parent.parent)
 if _project_root not in sys.path:
     sys.path.insert(0, _project_root)
 
-from core.config import get_settings  # noqa: E402
-from database.base import Base  # noqa: E402
-
 # ── Model imports ──────────────────────────────────────────────────────────────
 # Every SQLAlchemy model that defines a __tablename__ MUST be imported here.
 # Alembic uses Base.metadata to detect schema changes during autogenerate.
 # Without these imports the tables are invisible to autogenerate and it will
 # generate DROP TABLE statements to remove them.
-import models  # noqa: F401 — registers all models with Base.metadata
+import models  # noqa: E402,F401 — registers all models with Base.metadata
+from core.config import get_settings  # noqa: E402
+from database.base import Base  # noqa: E402
+
 # ──────────────────────────────────────────────────────────────────────────────
 
 alembic_config = context.config

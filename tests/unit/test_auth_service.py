@@ -15,15 +15,14 @@ an awaitable that resolves to a configured return_value.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
 from core.exceptions import ConflictError, UnauthorizedError
 from services.auth_service import AuthService
-
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -73,6 +72,7 @@ def _make_service(
     user_repo.update_last_login.return_value = None
 
     jwt_provider = MagicMock()
+
     # encode() returns a fake token string; decode() returns a plausible payload
     def _fake_encode(payload: dict) -> str:
         return f"fake_token_{payload.get('type', 'access')}"
@@ -136,9 +136,7 @@ def _make_service(
 class TestRegister:
     async def test_returns_token_pair(self) -> None:
         svc, _ = _make_service()
-        access, refresh = await svc.register(
-            email="alice@example.com", password="secure-pass-123"
-        )
+        access, refresh = await svc.register(email="alice@example.com", password="secure-pass-123")
         assert isinstance(access, str) and len(access) > 0
         assert isinstance(refresh, str) and len(refresh) > 0
 
@@ -173,9 +171,7 @@ class TestRegister:
 
     async def test_returns_two_different_tokens(self) -> None:
         svc, _ = _make_service()
-        access, refresh = await svc.register(
-            email="alice@example.com", password="secure-pass-123"
-        )
+        access, refresh = await svc.register(email="alice@example.com", password="secure-pass-123")
         assert access != refresh
 
 
@@ -185,9 +181,7 @@ class TestRegister:
 class TestLogin:
     async def test_returns_token_pair_on_success(self) -> None:
         svc, _ = _make_service(password_valid=True)
-        access, refresh = await svc.login(
-            email="alice@example.com", password="correct"
-        )
+        access, refresh = await svc.login(email="alice@example.com", password="correct")
         assert isinstance(access, str)
         assert isinstance(refresh, str)
 
@@ -269,7 +263,7 @@ class TestRefresh:
 class TestLogout:
     async def test_adds_access_jti_to_revocation_set(self) -> None:
         svc, mocks = _make_service()
-        future_exp = int(datetime.now(timezone.utc).timestamp()) + 900
+        future_exp = int(datetime.now(UTC).timestamp()) + 900
         await svc.logout(
             access_payload={"jti": "some-jti", "exp": future_exp},
         )
@@ -277,7 +271,7 @@ class TestLogout:
 
     async def test_deletes_refresh_token_from_redis_if_provided(self) -> None:
         svc, mocks = _make_service()
-        future_exp = int(datetime.now(timezone.utc).timestamp()) + 900
+        future_exp = int(datetime.now(UTC).timestamp()) + 900
         await svc.logout(
             access_payload={"jti": "some-jti", "exp": future_exp},
             refresh_token="fake_token_refresh",
@@ -287,7 +281,7 @@ class TestLogout:
     async def test_does_not_add_expired_token_to_revocation_set(self) -> None:
         """No point revoking an already-expired token."""
         svc, mocks = _make_service()
-        past_exp = int(datetime.now(timezone.utc).timestamp()) - 1
+        past_exp = int(datetime.now(UTC).timestamp()) - 1
         await svc.logout(
             access_payload={"jti": "some-jti", "exp": past_exp},
         )

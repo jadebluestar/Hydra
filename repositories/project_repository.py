@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import uuid
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,9 +23,7 @@ class ProjectRepository(BaseRepository[Project]):
         options: Sequence[Any] = (),
     ) -> Project | None:
         stmt = (
-            self._base_select()
-            .where(Project.organization_id == org_id)
-            .where(Project.slug == slug)
+            self._base_select().where(Project.organization_id == org_id).where(Project.slug == slug)
         )
         for opt in options:
             stmt = stmt.options(opt)

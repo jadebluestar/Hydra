@@ -8,9 +8,10 @@ Create Date: 2026-07-03 00:00:00.000000
 
 from __future__ import annotations
 
-from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
+
+from alembic import op
 
 revision: str = "8f3a9c2b1d4e"
 down_revision: str | None = "2c7912e0dc45"

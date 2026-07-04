@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from models.route import Route
-from models.upstream import Upstream
 from repositories.base import BaseRepository
 
 

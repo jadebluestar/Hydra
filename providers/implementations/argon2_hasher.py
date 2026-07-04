@@ -75,6 +75,7 @@ class Argon2Hasher:
         so the response time does not leak information about how close the
         guess was.
         """
+
         def _verify() -> bool:
             try:
                 return self._ph.verify(hashed, plaintext)
@@ -97,6 +98,4 @@ class Argon2Hasher:
                     new_hash = await hasher.hash(password)
                     await user_repo.update_password_hash(user.id, new_hash)
         """
-        return await asyncio.to_thread(
-            partial(self._ph.check_needs_rehash, hashed)
-        )
+        return await asyncio.to_thread(partial(self._ph.check_needs_rehash, hashed))

@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import uuid
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from models.membership import OrganizationMembership
-from models.user import User
 from repositories.base import BaseRepository
 
 
@@ -55,10 +54,7 @@ class MembershipRepository(BaseRepository[OrganizationMembership]):
         *,
         options: Sequence[Any] = (),
     ) -> list[OrganizationMembership]:
-        stmt = (
-            self._base_select()
-            .where(OrganizationMembership.user_id == user_id)
-        )
+        stmt = self._base_select().where(OrganizationMembership.user_id == user_id)
         for opt in options:
             stmt = stmt.options(opt)
         result = await self._session.execute(stmt)
