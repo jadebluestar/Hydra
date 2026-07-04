@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hydra Playground</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span class="logo">⌁ Hydra</span>
+        <span class="logo-sub">Playground</span>
+      </div>
+
+      <button id="new-request-btn" class="btn btn-block">+ New request</button>
+
+      <div class="sidebar-section-label">History</div>
+      <div id="history-list" class="history-list"></div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="auth-box">
+          <input id="token-input" type="password" placeholder="Bearer token (paste, or log in)" spellcheck="false" />
+          <button id="login-toggle-btn" class="btn btn-ghost">Log in</button>
+          <span id="auth-status" class="auth-status"></span>
+        </div>
+      </div>
+
+      <div id="login-panel" class="login-panel hidden">
+        <input id="login-email" type="email" placeholder="email" autocomplete="username" />
+        <input id="login-password" type="password" placeholder="password" autocomplete="current-password" />
+        <button id="login-submit-btn" class="btn">Sign in</button>
+        <span id="login-error" class="error-text"></span>
+      </div>
+
+      <div class="request-bar">
+        <select id="method-select">
+          <option>GET</option>
+          <option>POST</option>
+          <option>PUT</option>
+          <option>PATCH</option>
+          <option>DELETE</option>
+          <option>HEAD</option>
+          <option>OPTIONS</option>
+        </select>
+        <input id="url-input" type="text" placeholder="https://api.example.com/v1/things" spellcheck="false" />
+        <button id="send-btn" class="btn btn-primary">Send</button>
+      </div>
+
+      <div class="editor">
+        <div class="tabs">
+          <button class="tab active" data-tab="params">Params</button>
+          <button class="tab" data-tab="headers">Headers</button>
+          <button class="tab" data-tab="body">Body</button>
+        </div>
+
+        <div class="tab-panel" data-panel="params">
+          <table class="kv-table" id="params-table"></table>
+          <button class="btn btn-ghost btn-add" data-target="params">+ Add param</button>
+        </div>
+
+        <div class="tab-panel hidden" data-panel="headers">
+          <table class="kv-table" id="headers-table"></table>
+          <button class="btn btn-ghost btn-add" data-target="headers">+ Add header</button>
+        </div>
+
+        <div class="tab-panel hidden" data-panel="body">
+          <div class="body-type-row">
+            <label><input type="radio" name="body-type" value="none" checked /> none</label>
+            <label><input type="radio" name="body-type" value="json" /> JSON</label>
+            <label><input type="radio" name="body-type" value="text" /> raw / text</label>
+            <button id="beautify-btn" class="btn btn-ghost hidden">Beautify</button>
+          </div>
+          <textarea id="body-textarea" class="body-textarea hidden" spellcheck="false" placeholder="Request body"></textarea>
+        </div>
+      </div>
+
+      <div class="response">
+        <div class="response-meta" id="response-meta">
+          <span class="placeholder-text">Response will appear here</span>
+        </div>
+        <div class="tabs" id="response-tabs">
+          <button class="tab active" data-rtab="body">Body</button>
+          <button class="tab" data-rtab="headers">Headers</button>
+        </div>
+        <div class="tab-panel" data-rpanel="body">
+          <pre id="response-body" class="response-body"></pre>
+        </div>
+        <div class="tab-panel hidden" data-rpanel="headers">
+          <table class="kv-table readonly" id="response-headers-table"></table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

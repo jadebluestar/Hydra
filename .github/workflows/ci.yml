@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install ruff
+        run: pip install ruff
+      - name: Run ruff
+        run: ruff check . && ruff format --check .
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: hydra
+          POSTGRES_PASSWORD: hydra_secret
+          POSTGRES_DB: hydra_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run tests (excluding infra-only)
+        env:
+          DATABASE_URL: postgresql+asyncpg://hydra:hydra_secret@localhost:5432/hydra_test
+          REDIS_URL: redis://localhost:6379/1
+          JWT_SECRET_KEY: ci-secret-key-that-is-at-least-32-characters
+          APP_ENV: development
+          DEBUG: "false"
+        run: |
+          pytest tests/ -m "not infra" -v --cov=. --cov-report=term-missing
+
+      - name: Run infra tests
+        env:
+          DATABASE_URL: postgresql+asyncpg://hydra:hydra_secret@localhost:5432/hydra_test
+          REDIS_URL: redis://localhost:6379/1
+          JWT_SECRET_KEY: ci-secret-key-that-is-at-least-32-characters
+          APP_ENV: development
+          DEBUG: "false"
+        run: |
+          pytest tests/ -m infra -v
