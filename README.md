@@ -716,26 +716,6 @@ A complete demonstration of Hydra covers:
 
 ---
 
-## Repository
-
-The complete source code is available on GitHub.
-
-<!-- Add your GitHub repository URL here -->
-
----
-
-## License
-
-Add the project license here.
-
----
-
-## Acknowledgments
-
-Hydra was built using FastAPI, PostgreSQL, Redis, SQLAlchemy, HTTPX, Prometheus, Grafana, and Docker.
-
-
-**One gateway for your APIs.**
 
 
 
